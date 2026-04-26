@@ -14,7 +14,7 @@ const analyticsRoutes = require("./routes/analyticsRoutes");
 const app = express();
 
 // Core middleware
-app.use(cors("*"));
+app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {

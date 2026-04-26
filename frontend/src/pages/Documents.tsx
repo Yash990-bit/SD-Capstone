@@ -16,7 +16,7 @@ export default function Documents() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const profileRes = await fetch('http://localhost:3001/api/user/profile', {
+      const profileRes = await fetch(import.meta.env.VITE_API_URL + '/api/user/profile', {
         headers: { Authorization: `Bearer ${token}` },
       });
       const profileData = await profileRes.json();
@@ -25,13 +25,13 @@ export default function Documents() {
       setUser(userData);
 
       if (userData.role === 'doctor') {
-        const docsRes = await fetch('http://localhost:3001/api/documents/doctor/shared-documents', {
+        const docsRes = await fetch(import.meta.env.VITE_API_URL + '/api/documents/doctor/shared-documents', {
           headers: { Authorization: `Bearer ${token}` },
         });
         const docsData = await docsRes.json();
         if (docsRes.ok) setSharedDocs(docsData.data || []);
       } else {
-        const myRes = await fetch('http://localhost:3001/api/documents/patient/my-documents', {
+        const myRes = await fetch(import.meta.env.VITE_API_URL + '/api/documents/patient/my-documents', {
           headers: { Authorization: `Bearer ${token}` },
         });
         const myData = await myRes.json();
@@ -59,7 +59,7 @@ export default function Documents() {
 
   const viewDoctorDoc = async (shareId: string, fileUrl: string) => {
     try {
-      await fetch(`http://localhost:3001/api/documents/doctor/view/${shareId}`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/documents/doctor/view/${shareId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       window.open(fileUrl, '_blank', 'noopener,noreferrer');

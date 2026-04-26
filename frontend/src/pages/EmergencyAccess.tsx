@@ -5,7 +5,7 @@ import EmergencyProfileForm from '../components/EmergencyProfileForm';
 import EmergencyQRCodeCard from '../components/EmergencyQRCodeCard';
 import type { EmergencyPrivateData, EmergencyProfileData, User } from '../types';
 
-const API_BASE = 'http://localhost:3001';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 const EMPTY_PROFILE: EmergencyProfileData = {
   fullName: '',

@@ -147,7 +147,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const profileRes = await fetch('http://localhost:3001/api/user/profile', {
+        const profileRes = await fetch(import.meta.env.VITE_API_URL + '/api/user/profile', {
           headers: { Authorization: `Bearer ${token}` },
         });
         const profileData = await profileRes.json();
@@ -155,7 +155,7 @@ export default function Dashboard() {
         const userData: User = profileData.user || profileData.data || profileData;
         setUser(userData);
 
-        const recordsRes = await fetch('http://localhost:3001/api/records', {
+        const recordsRes = await fetch(import.meta.env.VITE_API_URL + '/api/records', {
           headers: { Authorization: `Bearer ${token}` },
         });
         const recordsData = await recordsRes.json();
@@ -163,7 +163,7 @@ export default function Dashboard() {
 
         // Fetch emergency profile for patient
         if (userData.role !== 'doctor') {
-          const emergRes = await fetch('http://localhost:3001/api/emergency/me', {
+          const emergRes = await fetch(import.meta.env.VITE_API_URL + '/api/emergency/me', {
             headers: { Authorization: `Bearer ${token}` },
           });
           if (emergRes.ok) {

@@ -39,7 +39,7 @@ export default function Appointments() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const profileRes = await fetch('http://localhost:3001/api/user/profile', {
+        const profileRes = await fetch(import.meta.env.VITE_API_URL + '/api/user/profile', {
           headers: { Authorization: `Bearer ${token}` },
         });
         const profileData = await profileRes.json();
@@ -49,8 +49,8 @@ export default function Appointments() {
 
         const endpoint =
           userData.role === 'doctor'
-            ? 'http://localhost:3001/api/appointments/doctor'
-            : 'http://localhost:3001/api/appointments/patient';
+            ? import.meta.env.VITE_API_URL + '/api/appointments/doctor'
+            : import.meta.env.VITE_API_URL + '/api/appointments/patient';
 
         const aptRes = await fetch(endpoint, {
           headers: { Authorization: `Bearer ${token}` },
@@ -61,7 +61,7 @@ export default function Appointments() {
         }
 
         if (userData.role !== 'doctor') {
-          const docRes = await fetch('http://localhost:3001/api/user/doctors', {
+          const docRes = await fetch(import.meta.env.VITE_API_URL + '/api/user/doctors', {
             headers: { Authorization: `Bearer ${token}` },
           });
           const docData = await docRes.json();
@@ -89,8 +89,8 @@ export default function Appointments() {
     try {
       const endpoint =
         user.role === 'doctor'
-          ? 'http://localhost:3001/api/appointments/doctor'
-          : 'http://localhost:3001/api/appointments/patient';
+          ? import.meta.env.VITE_API_URL + '/api/appointments/doctor'
+          : import.meta.env.VITE_API_URL + '/api/appointments/patient';
       const aptRes = await fetch(endpoint, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -108,7 +108,7 @@ export default function Appointments() {
     }
     setBooking(true);
     try {
-      const res = await fetch('http://localhost:3001/api/appointments', {
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/appointments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ doctorId, date, time, reason }),
@@ -135,7 +135,7 @@ export default function Appointments() {
       notes = input;
     }
     try {
-      const res = await fetch(`http://localhost:3001/api/appointments/${id}/${action}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/appointments/${id}/${action}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ notes: notes || '' }),
@@ -151,7 +151,7 @@ export default function Appointments() {
   const cancelAppointment = async (id: string) => {
     if (!window.confirm('Are you sure you want to cancel this appointment?')) return;
     try {
-      const res = await fetch(`http://localhost:3001/api/appointments/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/appointments/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });

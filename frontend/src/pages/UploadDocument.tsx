@@ -24,7 +24,7 @@ export default function UploadDocument() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const profileRes = await fetch('http://localhost:3001/api/user/profile', {
+      const profileRes = await fetch(import.meta.env.VITE_API_URL + '/api/user/profile', {
         headers: { Authorization: `Bearer ${token}` },
       });
       const profileData = await profileRes.json();
@@ -33,7 +33,7 @@ export default function UploadDocument() {
       setUser(userData);
 
       if (userData.role !== 'doctor') {
-        const docRes = await fetch('http://localhost:3001/api/user/doctors', {
+        const docRes = await fetch(import.meta.env.VITE_API_URL + '/api/user/doctors', {
           headers: { Authorization: `Bearer ${token}` },
         });
         const docData = await docRes.json();
@@ -92,7 +92,7 @@ export default function UploadDocument() {
     }
 
     try {
-      const res = await fetch('http://localhost:3001/api/documents/upload-and-share', {
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/documents/upload-and-share', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formData,

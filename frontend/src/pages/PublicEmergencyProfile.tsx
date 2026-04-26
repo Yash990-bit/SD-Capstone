@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import type { EmergencyProfileData } from '../types';
 
-const API_BASE = 'http://localhost:3001';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 function joinValues(values: string[]) {
   return values.length ? values.join(', ') : 'Not provided';

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../components/Sidebar';
+import AppShell from '../components/AppShell';
 import type { User, Doctor } from '../types';
 
 export default function UploadDocument() {
@@ -115,14 +115,12 @@ export default function UploadDocument() {
   if (loading || !user) return <div className="loading-screen">Loading Upload…</div>;
 
   return (
-    <>
-      <Sidebar user={user} onLogout={handleLogout} />
-      <main className="page-layout">
-        <div className="page-header">
-          <h1 className="page-title">Upload Document</h1>
-          <p className="page-subtitle">Securely upload and share your medical documents.</p>
-        </div>
-
+    <AppShell
+      user={user}
+      onLogout={handleLogout}
+      pageTitle="Upload Document"
+      pageSubtitle="Securely upload and share your medical documents"
+    >
         <div style={{ maxWidth: 600 }}>
           {error && <div className="error-banner">{error}</div>}
           <div className="card">
@@ -208,7 +206,6 @@ export default function UploadDocument() {
             </form>
           </div>
         </div>
-      </main>
-    </>
+    </AppShell>
   );
 }

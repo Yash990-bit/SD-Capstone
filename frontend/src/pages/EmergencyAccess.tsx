@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../components/Sidebar';
+import AppShell from '../components/AppShell';
 import EmergencyProfileForm from '../components/EmergencyProfileForm';
 import EmergencyQRCodeCard from '../components/EmergencyQRCodeCard';
 import type { EmergencyPrivateData, EmergencyProfileData, User } from '../types';
@@ -273,12 +273,14 @@ export default function EmergencyAccess() {
   }
 
   return (
-    <>
-      <Sidebar user={user} onLogout={handleLogout} />
-      <main className="page-layout">
-        <div className="page-header">
-          <h1 className="page-title">Emergency Access</h1>
-          <p className="page-subtitle">
+    <AppShell
+      user={user}
+      onLogout={handleLogout}
+      pageTitle="Emergency Access"
+      pageSubtitle="Create a secure QR code for life-saving emergency access"
+    >
+        <div className="page-header" style={{ marginBottom: 0 }}>
+          <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>
             Create a limited emergency profile and secure QR code for life-saving access.
           </p>
         </div>
@@ -360,7 +362,6 @@ export default function EmergencyAccess() {
             </div>
           </div>
         </div>
-      </main>
-    </>
+    </AppShell>
   );
 }

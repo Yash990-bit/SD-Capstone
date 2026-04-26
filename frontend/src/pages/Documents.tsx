@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../components/Sidebar';
+import AppShell from '../components/AppShell';
 import type { User, MedicalDocument, ShareDocument } from '../types';
 
 export default function Documents() {
@@ -81,18 +81,12 @@ export default function Documents() {
   if (loading || !user) return <div className="loading-screen">Loading Documents…</div>;
 
   return (
-    <>
-      <Sidebar user={user} onLogout={handleLogout} />
-      <main className="page-layout">
-        <div className="page-header">
-          <h1 className="page-title">Documents</h1>
-          <p className="page-subtitle">
-            {user.role === 'doctor'
-              ? 'Documents shared with you by your patients.'
-              : 'Your uploaded medical documents.'}
-          </p>
-        </div>
-
+    <AppShell
+      user={user}
+      onLogout={handleLogout}
+      pageTitle="Documents"
+      pageSubtitle={user.role === 'doctor' ? 'Documents shared with you by patients' : 'Your uploaded medical documents'}
+    >
         {error && <div className="error-banner">{error}</div>}
 
         {user.role !== 'doctor' ? (
@@ -185,7 +179,6 @@ export default function Documents() {
             )}
           </div>
         )}
-      </main>
-    </>
+    </AppShell>
   );
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../components/Sidebar';
+import AppShell from '../components/AppShell';
 import type { User, Appointment, Doctor } from '../types';
 
 function statusBadge(status: string) {
@@ -171,155 +171,148 @@ export default function Appointments() {
   if (loading || !user) return <div className="loading-screen">Loading Appointments…</div>;
 
   return (
-    <>
-      <Sidebar user={user} onLogout={handleLogout} />
-      <main className="page-layout">
-        <div className="page-header">
-          <h1 className="page-title">Appointments</h1>
-          <p className="page-subtitle">
-            {user.role === 'doctor'
-              ? 'Review and manage incoming appointment requests.'
-              : 'Book and track your appointments with doctors.'}
-          </p>
-        </div>
+    <AppShell
+      user={user}
+      onLogout={handleLogout}
+      pageTitle="Appointments"
+      pageSubtitle={user.role === 'doctor' ? 'Review and manage incoming requests' : 'Book and track your appointments'}
+    >
+      {error && <div className="error-banner">{error}</div>}
 
-        {error && <div className="error-banner">{error}</div>}
-
-        <div className="grid-2">
-          {user.role !== 'doctor' && (
-            <div className="col">
-              <div className="card">
-                <p className="card-title">Book an Appointment</p>
-                <form onSubmit={handleBookAppointment} className="upload-form">
-                  <div className="form-group">
-                    <label>Select Doctor</label>
-                    <select value={doctorId} onChange={(e) => setDoctorId(e.target.value)} required>
-                      <option value="">— Choose Doctor —</option>
-                      {doctors.map((doc) => (
-                        <option key={doc._id} value={doc._id}>
-                          Dr. {doc.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label>Date</label>
-                    <input
-                      type="date"
-                      value={date}
-                      onChange={(e) => setDate(e.target.value)}
-                      required
-                      min={new Date().toISOString().split('T')[0]}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Time</label>
-                    <input
-                      type="time"
-                      value={time}
-                      onChange={(e) => setTime(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Reason</label>
-                    <input
-                      type="text"
-                      value={reason}
-                      onChange={(e) => setReason(e.target.value)}
-                      placeholder="e.g., Routine Checkup"
-                      required
-                    />
-                  </div>
-                  <button type="submit" className="btn-primary" disabled={booking}>
-                    {booking ? 'Booking…' : 'Book Appointment'}
-                  </button>
-                </form>
-              </div>
-            </div>
-          )}
-
-          <div
-            className="col"
-            style={user.role === 'doctor' ? { gridColumn: '1 / -1' } : {}}
-          >
+      <div className="grid-2">
+        {user.role !== 'doctor' && (
+          <div className="col">
             <div className="card">
-              <p className="card-title">
-                {user.role === 'doctor' ? 'Appointment Requests' : 'My Appointments'}
-              </p>
-              {appointments.length === 0 ? (
-                <p className="no-data">No appointments found.</p>
-              ) : (
-                <ul className="records-list">
-                  {appointments.map((apt) => (
-                    <li
-                      key={apt._id}
-                      className="record-item"
-                      style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 10 }}
-                    >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'flex-start' }}>
-                        <div className="record-info" style={{ flex: 1 }}>
-                          <strong>
-                            {user.role === 'doctor'
-                              ? `Patient: ${apt.patientId?.name || 'Unknown'}`
-                              : `Dr. ${apt.doctorId?.name || 'Unknown'}`}
-                          </strong>
-                          <span>Reason: {apt.reason}</span>
-                          <span>
-                            {new Date(apt.date).toLocaleDateString()} at {apt.time}
-                          </span>
-                          {apt.notes && (
-                            <span style={{ marginTop: 4, fontStyle: 'italic' }}>
-                              Notes: {apt.notes}
-                            </span>
-                          )}
-                        </div>
-                        <span className={statusBadge(apt.status)}>{apt.status}</span>
-                      </div>
-
-                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                        {user.role === 'doctor' && apt.status === 'Pending' && (
-                          <>
-                            <button
-                              className="btn-sm btn-success"
-                              onClick={() => updateStatus(apt._id, 'accept')}
-                            >
-                              Accept
-                            </button>
-                            <button
-                              className="btn-sm btn-danger"
-                              onClick={() => updateStatus(apt._id, 'reject')}
-                            >
-                              Reject
-                            </button>
-                          </>
-                        )}
-                        {user.role === 'doctor' && apt.status === 'Accepted' && (
-                          <button
-                            className="btn-sm btn-blue"
-                            onClick={() => updateStatus(apt._id, 'complete')}
-                          >
-                            Mark Completed
-                          </button>
-                        )}
-                        {user.role !== 'doctor' &&
-                          (apt.status === 'Pending' || apt.status === 'Accepted') && (
-                            <button
-                              className="btn-sm btn-danger"
-                              onClick={() => cancelAppointment(apt._id)}
-                            >
-                              Cancel
-                            </button>
-                          )}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <p className="card-title">Book an Appointment</p>
+              <form onSubmit={handleBookAppointment} className="upload-form">
+                <div className="form-group">
+                  <label>Select Doctor</label>
+                  <select value={doctorId} onChange={(e) => setDoctorId(e.target.value)} required>
+                    <option value="">— Choose Doctor —</option>
+                    {doctors.map((doc) => (
+                      <option key={doc._id} value={doc._id}>
+                        Dr. {doc.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Date</label>
+                  <input
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    required
+                    min={new Date().toISOString().split('T')[0]}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Time</label>
+                  <input
+                    type="time"
+                    value={time}
+                    onChange={(e) => setTime(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Reason</label>
+                  <input
+                    type="text"
+                    value={reason}
+                    onChange={(e) => setReason(e.target.value)}
+                    placeholder="e.g., Routine Checkup"
+                    required
+                  />
+                </div>
+                <button type="submit" className="btn-primary" disabled={booking}>
+                  {booking ? 'Booking…' : 'Book Appointment'}
+                </button>
+              </form>
             </div>
           </div>
+        )}
+
+        <div
+          className="col"
+          style={user.role === 'doctor' ? { gridColumn: '1 / -1' } : {}}
+        >
+          <div className="card">
+            <p className="card-title">
+              {user.role === 'doctor' ? 'Appointment Requests' : 'My Appointments'}
+            </p>
+            {appointments.length === 0 ? (
+              <p className="no-data">No appointments found.</p>
+            ) : (
+              <ul className="records-list">
+                {appointments.map((apt) => (
+                  <li
+                    key={apt._id}
+                    className="record-item"
+                    style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 10 }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'flex-start' }}>
+                      <div className="record-info" style={{ flex: 1 }}>
+                        <strong>
+                          {user.role === 'doctor'
+                            ? `Patient: ${apt.patientId?.name || 'Unknown'}`
+                            : `Dr. ${apt.doctorId?.name || 'Unknown'}`}
+                        </strong>
+                        <span>Reason: {apt.reason}</span>
+                        <span>
+                          {new Date(apt.date).toLocaleDateString()} at {apt.time}
+                        </span>
+                        {apt.notes && (
+                          <span style={{ marginTop: 4, fontStyle: 'italic' }}>
+                            Notes: {apt.notes}
+                          </span>
+                        )}
+                      </div>
+                      <span className={statusBadge(apt.status)}>{apt.status}</span>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                      {user.role === 'doctor' && apt.status === 'Pending' && (
+                        <>
+                          <button
+                            className="btn-sm btn-success"
+                            onClick={() => updateStatus(apt._id, 'accept')}
+                          >
+                            Accept
+                          </button>
+                          <button
+                            className="btn-sm btn-danger"
+                            onClick={() => updateStatus(apt._id, 'reject')}
+                          >
+                            Reject
+                          </button>
+                        </>
+                      )}
+                      {user.role === 'doctor' && apt.status === 'Accepted' && (
+                        <button
+                          className="btn-sm btn-blue"
+                          onClick={() => updateStatus(apt._id, 'complete')}
+                        >
+                          Mark Completed
+                        </button>
+                      )}
+                      {user.role !== 'doctor' &&
+                        (apt.status === 'Pending' || apt.status === 'Accepted') && (
+                          <button
+                            className="btn-sm btn-danger"
+                            onClick={() => cancelAppointment(apt._id)}
+                          >
+                            Cancel
+                          </button>
+                        )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
-      </main>
-    </>
+      </div>
+    </AppShell>
   );
 }

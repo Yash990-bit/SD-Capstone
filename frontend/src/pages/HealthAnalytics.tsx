@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../components/Sidebar';
+import AppShell from '../components/AppShell';
 import AnalyticsScoreHero from '../components/AnalyticsScoreHero';
 import AnalyticsCharts from '../components/AnalyticsCharts';
 import VitalsLogForm from '../components/VitalsLogForm';
@@ -371,15 +371,12 @@ export default function HealthAnalytics() {
   }
 
   return (
-    <>
-      <Sidebar user={user} onLogout={handleLogout} />
-      <main className="page-layout">
-        <div className="page-header">
-          <h1 className="page-title">Health Analytics</h1>
-          <p className="page-subtitle">
-            Track trends, monitor risk indicators, and improve your long-term health trajectory.
-          </p>
-        </div>
+    <AppShell
+      user={user}
+      onLogout={handleLogout}
+      pageTitle="Health Analytics"
+      pageSubtitle="Track trends, monitor risk indicators, and improve your health"
+    >
 
         {error && <div className="error-banner">{error}</div>}
         {success && <div className="success-banner">{success}</div>}
@@ -427,7 +424,6 @@ export default function HealthAnalytics() {
           onEdit={handleEdit}
           onDelete={handleDelete}
         />
-      </main>
-    </>
+    </AppShell>
   );
 }

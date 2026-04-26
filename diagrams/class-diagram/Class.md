@@ -54,118 +54,293 @@ classDiagram
 
     %% SERVICES
     class AuthService {
-        +User registerUser(String name, String email, String password)
-        +String authenticateUser(String email, String password)
-        +String generateToken(User user)
-    }
+        ````markdown
+        # MediVault Class Diagram (updated)
 
-    class UserService {
-        +User getUserDetails(String userId)
-        +void updateUserRole(String userId, String role)
-    }
+        This document reflects the current backend domain models and main service/repository/controller relationships in the project (as of April 2026).
 
-    class RecordService {
-        +MedicalRecord createRecord(String patientId, String doctorId, String diagnosis)
-        +List~MedicalRecord~ fetchPatientRecords(String patientId)
-    }
+        ```mermaid
+        classDiagram
+            %% Controllers -> Services Relationships
+            AuthController --> AuthService
+            UserController --> UserService
+            RecordController --> RecordService
+            AppointmentController --> AppointmentService
+            DocumentShareController --> DocumentShareService
+            EmergencyController --> EmergencyService
+            AnalyticsController --> AnalyticsService
 
-    class AppointmentService {
-        +Appointment bookAppointment(String patientId, String doctorId, Date date)
-        +List~Appointment~ getDoctorSchedule(String doctorId)
-        +void cancelAppointment(String appointmentId)
-    }
+            %% Services -> Repositories Relationships
+            UserService --> UserRepository
+            RecordService --> MedicalRecordRepository
+            AppointmentService --> AppointmentRepository
+            DocumentShareService --> DocumentRepository
+            EmergencyService --> EmergencyProfileRepository
+            VitalsService --> VitalLogRepository
+            AnalyticsService --> AnalyticsSnapshotRepository
 
-    class DocumentShareService {
-        +void shareDocument(String documentId, String userId, String permissions)
-        +void revokeShare(String shareId)
-        +Boolean validateAccess(String documentId, String userId)
-    }
+            %% Models Relationships (based on mongoose schemas)
+            User "1" --> "0..*" MedicalRecord : owns
+            User "1" --> "0..*" MedicalDocument : patientDocuments
+            User "1" --> "0..*" VitalLog : vitals
+            User "1" --> "0..*" Appointment : appointmentsAsPatient
+            User "1" --> "0..*" Appointment : appointmentsAsDoctor
+            User "1" -- "1" EmergencyProfile : has
+            User "1" -- "1" AnalyticsSnapshot : snapshot
 
-    %% INTERFACE
-    class AccessStrategy {
-        <<Interface>>
-        +Boolean checkPermission(String permissions, String action)
-    }
+            MedicalDocument "1" --> "0..*" DocumentShare : shares
+            MedicalDocument "1" --> "0..*" DocumentAccessLog : accessLogs
+            DocumentShare "*" --> "1" User : patient/doctor
+            DocumentAccessLog "*" --> "1" User : doctor
 
-    %% REPOSITORIES 
-    class UserRepository {
-        +User findById(String id)
-        +User findByEmail(String email)
-        +void save(User user)
-        +void delete(String id)
-    }
+            %% CONTROLLERS (representative operations)
+            class AuthController {
+                +login(email, password)
+                +register(name, email, password)
+                +logout(token)
+            }
 
-    class MedicalRecordRepository {
-        +List~MedicalRecord~ findByPatient(String patientId)
-        +void save(MedicalRecord record)
-        +void update(MedicalRecord record)
-    }
+            class UserController {
+                +getProfile(userId)
+                +updateProfile(userId, data)
+            }
 
-    class DocumentRepository {
-        +void saveDocumentUrl(String recordId, String url)
-        +List~MedicalDocument~ findByRecordId(String recordId)
-        +void deleteDocument(String documentId)
-    }
+            class RecordController {
+                +uploadRecord(patientId, file)
+                +listRecords(patientId)
+            }
 
-    %% MODELS
-    class User {
-        -String id
-        -String name
-        -String email
-        -String passwordHash
-        -String role
-        +Boolean verifyPassword(String password)
-        +void updateProfile(String name, String email)
-    }
+            class AppointmentController {
+                +schedule(patientId, doctorId, date, time)
+                +listAppointments(userId)
+            }
 
-    class MedicalRecord {
-        -String id
-        -String patientId
-        -String doctorId
-        -String diagnosis
-        -String treatment
-        -Date date
-        +void updateRecord(String diagnosis, String treatment)
-        +String getDetails()
-    }
+            class DocumentShareController {
+                +shareDocument(documentId, patientId, doctorId, permission)
+                +revokeShare(shareId)
+            }
 
-    class MedicalDocument {
-        -String id
-        -String recordId
-        -String fileUrl_Cloudinary
-        -String format
-        -int size
-        +String generateDownloadLink()
-    }
+            class EmergencyController {
+                +enableEmergencyAccess(userId)
+                +getPublicProfile(emergencyToken)
+            }
 
-    class Appointment {
-        -String id
-        -String patientId
-        -String doctorId
-        -Date appointmentDate
-        -String status
-        -String notes
-        +void confirm()
-        +void cancel()
-        +void reschedule(Date newDate)
-    }
+            class AnalyticsController {
+                +computeHealthScore(userId)
+                +getSnapshot(userId)
+            }
 
-    class DocumentShare {
-        -String id
-        -String documentId
-        -String sharedWithUserId
-        -String permissions
-        -Date expiryDate
-        +Boolean isExpired()
-        +void revokeAccess()
-    }
+            %% SERVICES (representative)
+            class AuthService {
+                +registerUser(name, email, password)
+                +authenticate(email, password)
+                +generateToken(user)
+            }
 
-    class DocumentAccessLog {
-        -String id
-        -String documentId
-        -String accessedByUserId
-        -Date timestamp
-        -String action
-        +void logAction(String action)
-    }
-```
+            class UserService {
+                +getUser(userId)
+                +updateUser(userId, data)
+            }
+
+            class RecordService {
+                +createRecord(userId, file)
+                +fetchRecords(userId)
+            }
+
+            class AppointmentService {
+                +bookAppointment(patientId, doctorId, date, time)
+                +cancelAppointment(appointmentId)
+            }
+
+            class DocumentShareService {
+                +shareDocument(documentId, patientId, doctorId, permission)
+                +validateAccess(documentId, userId, action)
+            }
+
+            class EmergencyService {
+                +createOrUpdateProfile(userId, profileData)
+                +generateEmergencyToken(userId)
+            }
+
+            class VitalsService {
+                +logVital(userId, vitalData)
+                +getVitals(userId, range)
+            }
+
+            class AnalyticsService {
+                +updateSnapshot(userId)
+                +getSnapshot(userId)
+            }
+
+            %% REPOSITORIES (representative)
+            class UserRepository {
+                +findById(id)
+                +findByEmail(email)
+                +save(user)
+            }
+
+            class MedicalRecordRepository {
+                +findByUser(userId)
+                +save(record)
+            }
+
+            class DocumentRepository {
+                +findByPatient(patientId)
+                +save(document)
+            }
+
+            class AppointmentRepository {
+                +findByUser(userId)
+                +save(appointment)
+            }
+
+            class EmergencyProfileRepository {
+                +findByUser(userId)
+                +save(profile)
+            }
+
+            class VitalLogRepository {
+                +findByUser(userId)
+                +save(vitalLog)
+            }
+
+            class AnalyticsSnapshotRepository {
+                +findByUser(userId)
+                +save(snapshot)
+            }
+
+            %% MODELS (from backend/models/*.js)
+            class User {
+                -ObjectId id
+                -String name
+                -String email <<unique>>
+                -String password
+                -String role {patient|doctor}
+                -Date createdAt
+                -Date updatedAt
+            }
+
+            class MedicalRecord {
+                -ObjectId id
+                -ObjectId user (ref User)
+                -String fileName
+                -String originalName
+                -String fileUrl
+                -String publicId
+                -Number size
+                -Date createdAt
+                -Date updatedAt
+            }
+
+            class MedicalDocument {
+                -ObjectId id
+                -ObjectId patientId (ref User)
+                -String title
+                -String description
+                -String fileUrl
+                -String cloudinaryPublicId
+                -String fileType
+                -String documentType
+                -Date createdAt
+                -Date updatedAt
+            }
+
+            class DocumentShare {
+                -ObjectId id
+                -ObjectId documentId (ref MedicalDocument)
+                -ObjectId patientId (ref User)
+                -ObjectId doctorId (ref User)
+                -String permission {VIEW|DOWNLOAD|FULL_ACCESS}
+                -String expiry {1H|24H|7D|NEVER}
+                -Date expiresAt
+                -Date createdAt
+                -Date updatedAt
+            }
+
+            class DocumentAccessLog {
+                -ObjectId id
+                -ObjectId documentId (ref MedicalDocument)
+                -ObjectId doctorId (ref User)
+                -String action {VIEW|DOWNLOAD|REVOKE|SHARE}
+                -Date accessedAt
+            }
+
+            class Appointment {
+                -ObjectId id
+                -ObjectId patientId (ref User)
+                -ObjectId doctorId (ref User)
+                -Date date
+                -String time
+                -String reason
+                -String status {Pending|Accepted|Rejected|Completed|Cancelled}
+                -String notes
+                -Date createdAt
+                -Date updatedAt
+            }
+
+            class EmergencyProfile {
+                -ObjectId id
+                -ObjectId user (ref User) <<unique>>
+                -Boolean emergencyAccessEnabled
+                -String emergencyToken <<unique>>
+                -EmergencyProfileData emergencyProfile
+                -Date createdAt
+                -Date updatedAt
+            }
+
+            class EmergencyProfileData {
+                -String fullName
+                -Number age
+                -String bloodGroup
+                -String[] allergies
+                -String[] conditions
+                -String[] medications
+                -Contact[] emergencyContacts
+                -String notes
+            }
+
+            class Contact {
+                -String name
+                -String relation
+                -String phone
+            }
+
+            class VitalLog {
+                -ObjectId id
+                -ObjectId userId (ref User)
+                -Date date
+                -Number weight
+                -Number height
+                -Number bmi
+                -Number bloodPressureSystolic
+                -Number bloodPressureDiastolic
+                -Number bloodSugarFasting
+                -Number bloodSugarRandom
+                -Number heartRate
+                -Number oxygenLevel
+                -Number temperature
+                -Number sleepHours
+                -Number steps
+                -String notes
+                -Date createdAt
+                -Date updatedAt
+            }
+
+            class AnalyticsSnapshot {
+                -ObjectId id
+                -ObjectId userId (ref User) <<unique>>
+                -Number healthScore (0..100)
+                -String[] riskFlags
+                -String[] recommendations
+                -Date createdAt
+            }
+
+            %% Notes
+            note for EmergencyProfileData
+              Embedded/composed document stored inside EmergencyProfile
+            end note
+
+            note "Indexes: email(unique), EmergencyProfile.user(unique), AnalyticsSnapshot.user(unique), VitalLog index {userId,date}" as N1
+            end note
+        ```
+        ````
